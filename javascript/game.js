@@ -15,6 +15,7 @@ let chickens = [];
 let Character_Energy = 100;
 let placedBottles = [1000, 1600, 2300, 3500];
 let tabasco = 0;
+let bottleThrowTime = 0;
 // CONFIG
 
 let JUMP_TIME = 300; // in ms
@@ -65,7 +66,7 @@ function checkForCollisions() {
 }
 
 
-function bottleCounter(){
+function bottleCounter() {
     let base_image = new Image();
     base_image.src = "../img/tabasco.png";
     if (base_image.complete) {
@@ -73,7 +74,7 @@ function bottleCounter(){
     }
 
     context.font = "30px fantasy";
-    context.fillText( "x " + tabasco , 50,50);
+    context.fillText("x " + tabasco, 50, 50);
 }
 
 function drawEnergyBar() {
@@ -123,8 +124,27 @@ function draw() {
     drawEnergyBar();
     drawBottles();
     bottleCounter();
+    drawThrowbottle();
     requestAnimationFrame(draw);
 }
+
+
+function drawThrowbottle() {
+    if (bottleThrowTime) {
+
+
+        let timepassed = new Date().getTime() - bottleThrowTime;
+        let gravity = Math.pow(9.81, timepassed / 300);
+        let bottle_x = 145 + (timepassed * 0.9);
+        let bottle_y = 510 - (timepassed * 0.4 - gravity);
+        let base_image = new Image();
+        base_image.src = "../img/tabasco.png";
+        if (base_image.complete) {
+            context.drawImage(base_image, bottle_x, bottle_y, base_image.width * 0.5, base_image.height * 0.5);
+        }
+    }
+}
+
 
 
 function drawBottles() {
@@ -212,13 +232,13 @@ function drawbackground() {
 
     // Draw Clouds
     addBackgroundObject('../img/cloud1.png', 200 - cloudOffset, 110, 1,);
-    addBackgroundObject('../img/cloud2.png', 700 - cloudOffset, 110, 1,);
-    addBackgroundObject('../img/cloud1.png', 1300 - cloudOffset, 110, 1,);
+    addBackgroundObject('../img/cloud2.png', 600 - cloudOffset, 110, 1,);
+    addBackgroundObject('../img/cloud1.png', 5900 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud2.png', 1700 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud1.png', 2200 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud2.png', 2700 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud1.png', 3300 - cloudOffset, 110, 1,);
-    addBackgroundObject('../img/cloud2.png', 00 - cloudOffset, 110, 1,);
+    addBackgroundObject('../img/cloud2.png', 6100 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud1.png', 3900 - cloudOffset, 110, 1,);
     addBackgroundObject('../img/cloud2.png', 5200 - cloudOffset, 110, 1,);
     drawGround();
@@ -278,10 +298,18 @@ function listenforkeys() {
     document.addEventListener("keydown", e => {
         const k = e.key;
 
-        console.log(e.key)
         if (e.code == "Space") {
             lastJumpStarted = new Date().getTime();
             AUDIO_JUMP.play();
+        }
+
+        if (k == "d" && tabasco > 0) {
+            let timePassed = new Date().getTime() - bottleThrowTime;
+            if (timePassed > 1000) {
+                tabasco--;
+                bottleThrowTime = new Date().getTime() - lastJumpStarted;    
+            }
+                
         }
 
         if (k == "ArrowRight") {
